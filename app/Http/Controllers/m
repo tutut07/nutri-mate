@@ -1,0 +1,155 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class RekomendasiController extends Controller
+{
+    // =========================
+    // TAMPILKAN FORM
+    // =========================
+    public function index()
+    {
+        session()->forget('tidak_suka');
+        return view('rekomendasi');
+    }
+
+    // =========================
+    // HITUNG REKOMENDASI AWAL
+    // =========================
+    public function hitung(Request $request)
+{
+    $input = $request->all();
+    session(['input_user' => $input]);
+
+    // ===== HITUNG BMR =====
+    $jk     = $input['jenis_kelamin'];
+    $usia   = $input['usia'];
+    $berat  = $input['berat'];
+    $tinggi = $input['tinggi'];
+
+    if ($jk == 'pria') {
+        $bmr = 66 + (13.7 * $berat) + (5 * $tinggi) - (6.8 * $usia);
+    } else {
+        $bmr = 655 + (9.6 * $berat) + (1.8 * $tinggi) - (4.7 * $usia);
+    }
+
+    // ===== KEBUTUHAN HARIAN =====
+    $kalori_harian = $bmr * 1.55;
+
+    $protein_harian = ($kalori_harian * 0.15) / 4;
+    $lemak_harian   = ($kalori_harian * 0.25) / 9;
+    $karbo_harian   = ($kalori_harian * 0.60) / 4;
+    $serat_harian   = 25;
+
+    // ===== TARGET PER PORSI =====
+    $target_kalori = $kalori_harian / 3;
+    $target_protein = $protein_harian / 3;
+    $target_lemak = $lemak_harian / 3;
+    $target_karbo = $karbo_harian / 3;
+    $target_serat = $serat_harian / 3;
+
+    // ===== AMBIL DATA =====
+    $data = DB::table('data_bahan')->get();
+
+    // ===== HITUNG SKOR SIMILARITY =====
+    foreach ($data as $item) {
+        $item->skor =
+            abs($item->energi - $target_kalori) * 0.40 +
+            abs($item->protein - $target_protein) * 0.25 +
+            abs($item->lemak - $target_lemak) * 0.15 +
+            abs($item->karbo - $target_karbo) * 0.15 +
+            abs($item->serat - $target_serat) * 0.05;
+    }
+
+    // Urutkan skor terkecil = terbaik
+    $sorted = $data->sortBy('skor');
+
+    // ===== AMBIL 1 PER KATEGORI =====
+    $kategoriList = ['Protein', 'Sayur', 'Buah', 'Snack', 'Karbohidrat'];
+    $rekomendasi = collect();
+
+    foreach ($kategoriList as $kategori) {
+        $menu = $sorted->where('kategori', $kategori)->first();
+        if ($menu) {
+            $rekomendasi->push($menu);
+        }
+    }
+
+    // Hitung total
+    $total_energi = $rekomendasi->sum('energi');
+    $total_protein = $rekomendasi->sum('protein');
+    $total_lemak = $rekomendasi->sum('lemak');
+    $total_karbo = $rekomendasi->sum('karbo');
+    $total_serat = $rekomendasi->sum('serat');
+
+    return view('rekomendasi', compact(
+        'bmr','kalori_harian','protein_harian','lemak_harian',
+        'karbo_harian','serat_harian','rekomendasi','input',
+        'total_energi','total_protein','total_lemak','total_karbo','total_serat'
+    ));
+}
+
+
+    // =========================================
+    // GANTI MENU TIDAK DISUKAI
+    // =========================================
+    public function tolak(Request $request)
+{
+    $input = session('input_user');
+    if (!$input) {
+        return redirect('/rekomendasi')->with('error', 'Silakan isi form terlebih dahulu.');
+    }
+
+    // Tambah list tidak disukai
+    $tidak_suka_lama = session('tidak_suka', []);
+    $tidak_suka_baru = $request->input('tidak_suka', []);
+    $tidak_suka = array_unique(array_merge($tidak_suka_lama, $tidak_suka_baru));
+    session(['tidak_suka' => $tidak_suka]);
+
+    // Hitung ulang input nutrisi
+    $jk = $input['jenis_kelamin'];
+    $usia = $input['usia'];
+    $berat = $input['berat'];
+    $tinggi = $input['tinggi'];
+
+    if ($jk == 'pria') {
+        $bmr = 66 + (13.7 * $berat) + (5 * $tinggi) - (6.8 * $usia);
+    } else {
+        $bmr = 655 + (9.6 * $berat) + (1.8 * $tinggi) - (4.7 * $usia);
+    }
+
+    $kalori_harian = $bmr * 1.55;
+    $target = $kalori_harian / 3;
+
+    // Ambil ulang rekomendasi per kategori
+    $kategoriList = ['Protein','Sayur','Buah','Snack','Karbohidrat'];
+    $rekomendasi = [];
+
+    foreach ($kategoriList as $kategori) {
+        $menu = DB::table('data_bahan')
+            ->where('kategori', $kategori)
+            ->whereNotIn('id', $tidak_suka)
+            ->orderByRaw('ABS(energi - ?)', [$target])
+            ->first();
+
+        if ($menu) {
+            $rekomendasi[] = $menu;
+        }
+    }
+
+    return view('rekomendasi', [
+        'bmr' => $bmr,
+        'kalori_harian' => $kalori_harian,
+        'protein_harian' => ($kalori_harian * 0.15) / 4,
+        'lemak_harian' => ($kalori_harian * 0.25) / 9,
+        'karbo_harian' => ($kalori_harian * 0.60) / 4,
+        'serat_harian' => 25,
+        'rekomendasi' => $rekomendasi,
+        'input' => $input
+    ]);
+}
+
+}

@@ -1,0 +1,132 @@
+/* public/css/auth.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: #fff;
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+input:focus {
+    border-color: #6b21a8;
+    outline: none;
+    box-shadow: 0 0 5px rgba(107,33,168,0.3);
+}
+
+button {
+    width: 100%;
+    background-color: #6b21a8;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #7c3aed;
+}
+
+.text-center {
+    text-align: center;
+}
+
+a {
+    color: #6b21a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.error {
+    color: red;
+    text-align: center;
+    margin-bottom: 15px;
+}
+/* Bungkus password agar ukurannya SAMA seperti input biasa */
+.input-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: -4px;
+    top: 35%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #777;
+    font-size: 18px;
+    z-index: 10;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding-right: 12px; /* supaya text tidak tertutup ikon */
+}
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background: #45a049;
+}
+
+.btn-home {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #2196F3;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-home:hover {
+    background: #0b7dda;
+}

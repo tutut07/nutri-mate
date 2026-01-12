@@ -1,0 +1,37 @@
+/* Umum */
+body {
+    background-color: #f8f9fa;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Section Tentang Gizi */
+.tentang-section {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.tentang-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 128, 0, 0.1);
+}
+
+/* Section Data Gizi */
+.data-section {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.data-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 128, 0, 0.1);
+}
+
+/* List styling */
+.data-section ul li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+    .tentang-section,
+    .data-section {
+        padding: 2rem;
+    }
+}
