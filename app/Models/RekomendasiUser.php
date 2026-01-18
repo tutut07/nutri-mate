@@ -15,11 +15,18 @@ class RekomendasiUser extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'user_id',
-        'data_bahan_id',
-        'kategori',
-        'tanggal', // boleh tetap ada
-    ];
+    'user_id',
+    'nama',
+    'kategori',
+    'usia',
+    'berat',
+    'tinggi',
+    'jenis_kelamin',
+    'data_bahan_id',
+    'tanggal'
+];
+
+
 
     // ✅ CAST KE CARBON (BIAR JAM AMAN)
     protected $casts = [

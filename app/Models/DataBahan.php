@@ -10,6 +10,7 @@ class DataBahan extends Model
 
     protected $fillable = [
         'bahan',
+        'kategori',
         'energi',
         'protein',
         'lemak',

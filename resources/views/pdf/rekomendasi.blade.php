@@ -36,96 +36,110 @@
 
     <h2>Rekomendasi Menu Makanan</h2>
 
+    {{-- ========================= --}}
+    {{-- DATA AKUN (LOGIN) --}}
+    {{-- ========================= --}}
     <p>
-        <strong>Nama Pengguna:</strong> {{ $user->name ?? $user->username ?? '-' }} <br>
+        <strong>Nama Akun:</strong>
+        {{ $user->name ?? $user->username ?? '-' }} <br>
 
         <strong>Tanggal:</strong>
         {{ \Carbon\Carbon::parse($tanggal)->format('d-m-Y') }} <br>
 
         <strong>Jam:</strong>
-        {{ \Carbon\Carbon::parse($waktu)->format('H:i') }}
+        {{ $jam }}
     </p>
 
     <hr>
 
-    <h3>Data Pengguna</h3>
+    {{-- ========================= --}}
+    {{-- DATA PENGGUNA (ANAK) --}}
+    {{-- ========================= --}}
+    @php
+        $anak = $riwayat->first();
+    @endphp
+
+    <h3>Data Pengguna (Anak)</h3>
+
     <ul>
-        <li>Jenis Kelamin: {{ $input['jenis_kelamin'] ?? '-' }}</li>
-        <li>Usia: {{ $input['usia'] ?? '-' }} tahun</li>
-        <li>Berat Badan: {{ $input['berat'] ?? '-' }} kg</li>
-        <li>Tinggi Badan: {{ $input['tinggi'] ?? '-' }} cm</li>
+        <li><strong>Nama Anak:</strong> {{ $anak->nama ?? '-' }}</li>
+        <li><strong>Jenis Kelamin:</strong> {{ $anak->jenis_kelamin ?? '-' }}</li>
+        <li><strong>Usia:</strong> {{ $anak->usia ?? '-' }} tahun</li>
+        <li><strong>Berat Badan:</strong> {{ $anak->berat ?? '-' }} kg</li>
+        <li><strong>Tinggi Badan:</strong> {{ $anak->tinggi ?? '-' }} cm</li>
     </ul>
 
+    <hr>
 
-    <h3>Hasil Perhitungan Kebutuhan Gizi Harian</h3>
+    {{-- ========================= --}}
+    {{-- HASIL GIZI --}}
+    {{-- ========================= --}}
+    <h3>Hasil Perhitungan Kebutuhan Gizi</h3>
 
-<table>
-    <thead>
-        <tr>
-            <th>Komponen</th>
-            <th>Jumlah</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Energi</td>
-            <td>{{ number_format($hasilGizi['energi'], 2) }} kkal</td>
-        </tr>
-        <tr>
-            <td>Protein</td>
-            <td>{{ number_format($hasilGizi['protein'], 2) }} g</td>
-        </tr>
-        <tr>
-            <td>Lemak</td>
-            <td>{{ number_format($hasilGizi['lemak'], 2) }} g</td>
-        </tr>
-        <tr>
-            <td>Karbohidrat</td>
-            <td>{{ number_format($hasilGizi['karbo'], 2) }} g</td>
-        </tr>
-        <tr>
-            <td>Serat</td>
-            <td>{{ number_format($hasilGizi['serat'], 2) }} g</td>
-        </tr>
-    </tbody>
-</table>
+    <table>
+        <thead>
+            <tr>
+                <th>Komponen</th>
+                <th>Jumlah</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Energi</td>
+                <td>{{ number_format($hasilGizi['energi'], 2) }} kkal</td>
+            </tr>
+            <tr>
+                <td>Protein</td>
+                <td>{{ number_format($hasilGizi['protein'], 2) }} g</td>
+            </tr>
+            <tr>
+                <td>Lemak</td>
+                <td>{{ number_format($hasilGizi['lemak'], 2) }} g</td>
+            </tr>
+            <tr>
+                <td>Karbohidrat</td>
+                <td>{{ number_format($hasilGizi['karbo'], 2) }} g</td>
+            </tr>
+            <tr>
+                <td>Serat</td>
+                <td>{{ number_format($hasilGizi['serat'], 2) }} g</td>
+            </tr>
+        </tbody>
+    </table>
 
+    <hr>
 
+    {{-- ========================= --}}
+    {{-- TABEL REKOMENDASI --}}
+    {{-- ========================= --}}
     <h3>Rekomendasi Menu</h3>
 
-    @if($riwayat->count())
-        <table>
-            <thead>
+    <table>
+        <thead>
+            <tr>
+                <th>Kategori</th>
+                <th>Nama Menu</th>
+                <th>Energi</th>
+                <th>Protein</th>
+                <th>Lemak</th>
+                <th>Karbo</th>
+                <th>Serat</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($riwayat as $item)
                 <tr>
-                    <th>Kategori</th>
-                    <th>Nama Menu</th>
-                    <th>Energi</th>
-                    <th>Protein</th>
-                    <th>Lemak</th>
-                    <th>Karbo</th>
-                    <th>Serat</th>
+                    <td>{{ $item->kategori }}</td>
+                    <td>{{ optional($item->bahan)->bahan ?? '-' }}</td>
+                    <td>{{ optional($item->bahan)->energi ?? 0 }}</td>
+                    <td>{{ optional($item->bahan)->protein ?? 0 }}</td>
+                    <td>{{ optional($item->bahan)->lemak ?? 0 }}</td>
+                    <td>{{ optional($item->bahan)->karbo ?? 0 }}</td>
+                    <td>{{ optional($item->bahan)->serat ?? 0 }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach($riwayat as $item)
-                    <tr>
-                        <td>{{ $item->kategori }}</td>
-
-                        {{-- NAMA MENU dari tabel bahan --}}
-                        <td>{{ optional($item->bahan)->bahan ?? '-' }}</td>
-
-                        <td>{{ optional($item->bahan)->energi ?? 0 }}</td>
-                        <td>{{ optional($item->bahan)->protein ?? 0 }}</td>
-                        <td>{{ optional($item->bahan)->lemak ?? 0 }}</td>
-                        <td>{{ optional($item->bahan)->karbo ?? 0 }}</td>
-                        <td>{{ optional($item->bahan)->serat ?? 0 }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @else
-        <p><em>Data rekomendasi tidak tersedia.</em></p>
-    @endif
+            @endforeach
+        </tbody>
+    </table>
 
     <p style="margin-top:20px;">
         <em>Dokumen ini dihasilkan otomatis oleh sistem rekomendasi nutrisi.</em>

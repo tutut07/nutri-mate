@@ -57,21 +57,31 @@ class AdminController extends Controller
 
     public function createMenu()
     {
-        return view('admin.create-menu');
+        return view('admin.tambah-menu');
     }
 
     public function storeMenu(Request $request)
     {
         $request->validate([
-            'bahan' => 'required|string|max:255',
-            'energi' => 'required|numeric',
-            'protein' => 'required|numeric',
-            'lemak' => 'required|numeric',
-            'karbo' => 'required|numeric',
-            'serat' => 'required|numeric',
-        ]);
+    'bahan'   => 'required|string',
+    'kategori'=> 'required|string',
+    'energi'  => 'required|numeric',
+    'protein' => 'required|numeric',
+    'lemak'   => 'required|numeric',
+    'karbo'   => 'required|numeric',
+    'serat'   => 'required|numeric',
+]);
 
-        DataBahan::create($request->all());
+DataBahan::create([
+    'bahan'    => $request->bahan,
+    'kategori' => $request->kategori,
+    'energi'   => $request->energi,
+    'protein'  => $request->protein,
+    'lemak'    => $request->lemak,
+    'karbo'    => $request->karbo,
+    'serat'    => $request->serat,
+]);
+
 
         return redirect()->route('admin.menu.index')->with('success', 'Menu berhasil ditambahkan!');
     }

@@ -38,22 +38,26 @@
         @csrf
         <div class="row g-3">
             <div class="mb-3">
-    <label class="form-label">Nama</label>
+</div>
+    <div class="mb-3">
+    <label class="form-label fw-semibold">Nama</label>
     <input
         type="text"
         name="nama"
         class="form-control"
         placeholder="Masukkan nama"
+        value="{{ old('nama', $input['nama'] ?? '') }}"
         required
     >
 </div>
+
 
             <div class="col-md-6">
                 <label class="form-label">Jenis Kelamin</label>
                 <select name="jenis_kelamin" class="form-select" required>
                     <option value="">-- Pilih --</option>
-                    <option value="pria" {{ old('jenis_kelamin')=='pria' ? 'selected' : '' }}>Pria</option>
-                    <option value="wanita" {{ old('jenis_kelamin')=='wanita' ? 'selected' : '' }}>Wanita</option>
+                    <option value="pria" {{ old('jenis_kelamin')=='pria' ? 'selected' : '' }}>Laki-Laki</option>
+                    <option value="wanita" {{ old('jenis_kelamin')=='wanita' ? 'selected' : '' }}>Perempuan</option>
                 </select>
                 @error('jenis_kelamin')
                     <div class="text-danger mt-1">{{ $message }}</div>

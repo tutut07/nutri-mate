@@ -5,10 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Rekomendasi Makanan')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<style>
+.navbar-custom {
+    background: linear-gradient(
+        90deg,
+        #c4dad2,
+        #6a9c89
+    );
+}
+
+/* WARNA TEKS NAVBAR */
+.navbar-custom .nav-link,
+.navbar-custom .navbar-brand {
+    color: #1f2937; /* abu gelap / hitam soft */
+    font-weight: 500;
+}
+
+.footer-custom {
+    background: linear-gradient(
+        90deg,
+        #c4dad2,
+        #6a9c89
+    );
+    color: #1f2937;
+}
+
+
+</style>
+
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom shadow-sm">
+
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ url('/') }}">NutriMate</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -69,6 +99,7 @@
                             <a class="nav-link {{ request()->is('tentang') ? 'active' : '' }}" 
                                href="{{ url('/tentang') }}">Tentang</a>
                         </li>
+                        
                     @endauth
                 </ul>
 
@@ -83,24 +114,25 @@
                     </div>
                 @else
                     <div class="d-flex">
-                        <a href="{{ url('/login') }}" class="btn btn-outline-light btn-sm me-2">Login</a>
-                        <a href="{{ url('/register') }}" class="btn btn-warning btn-sm">Daftar</a>
+                        <a href="{{ url('/login') }}" class="btn btn-outline-dark btn-sm me-2">Login</a>
+                        <a href="{{ url('/register') }}" class="btn btn-success btn-sm">Daftar</a>
+
                     </div>
                 @endauth
             </div>
         </div>
     </nav>
 
-    <div class="container mt-5 flex-fill">
+    <div class="container mt-0 flex-fill">
         @yield('content')
     </div>
 
-    <footer class="bg-success text-white text-center py-3 mt-auto shadow-sm">
+    <footer class="footer-custom text-center py-3 mt-auto shadow-sm">
         <div class="container">
             <p class="mb-0">
-                &copy; {{ date('Y') }} <strong>Rekomendasi Makanan</strong> — Semua Hak Dilindungi 🌿
+                &copy; {{ date('Y') }} <strong>Rekomendasi Makanan</strong> — NutriMate
             </p>
-            <small>Dibuat dengan 💚 menggunakan Laravel & Bootstrap</small>
+            <small>Semua Hak Dilindungi</small>
         </div>
     </footer>
 

@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container py-5">
+
     <h2 class="text-center mb-4 text-success fw-bold">
         Riwayat Rekomendasi Makanan
     </h2>
@@ -11,21 +12,50 @@
             Belum ada riwayat rekomendasi.
         </div>
     @else
-        @foreach($riwayat as $tanggal => $items)
+
+        @foreach($riwayat as $group)
+
+            @php
+                // 🔥 Ambil data PASTI dari database
+                $first   = $group->first();
+                $tanggal = $first->tanggal;
+                $nama    = $first->nama;
+            @endphp
+
             <div class="card mb-4 shadow-sm">
 
-                <div class="card-header bg-success text-white 
-                            d-flex justify-content-between align-items-center">
-                    <span>
-                        📅 {{ \Carbon\Carbon::parse($tanggal)->format('d M Y') }}
-                    </span>
+                {{-- HEADER --}}
+                <div class="card-header bg-success text-white
+            d-flex justify-content-between align-items-center">
 
-                    <a href="{{ route('riwayat.download', $tanggal) }}"
-                       class="btn btn-sm btn-light text-success fw-bold">
-                        ⬇ Download PDF
-                    </a>
-                </div>
+    <div>
+        Tanggal: {{ \Carbon\Carbon::parse($tanggal)->format('d M Y') }}
+        <br>
+        Nama: <strong>{{ $nama }}</strong>
+    </div>
 
+    <div class="d-flex gap-2">
+        {{-- DOWNLOAD --}}
+        <a href="{{ route('riwayat.download', [$tanggal, $nama]) }}"
+           class="btn btn-sm btn-light text-success fw-bold">
+            ⬇ Download PDF
+        </a>
+
+        {{-- HAPUS --}}
+        <form action="{{ route('riwayat.hapus', [$tanggal, $nama]) }}"
+              method="POST"
+              onsubmit="return confirm('Yakin ingin menghapus riwayat ini?')">
+            @csrf
+            @method('DELETE')
+            <button class="btn btn-sm btn-danger fw-bold">
+                🗑 Hapus
+            </button>
+        </form>
+    </div>
+
+</div>
+
+                {{-- BODY --}}
                 <div class="card-body">
                     <table class="table table-bordered table-hover">
                         <thead class="table-success">
@@ -41,16 +71,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($items as $item)
+                            @foreach($group as $item)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>{{ $item->kategori }}</td>
-                                    <td>{{ $item->bahan->bahan }}</td>
-                                    <td>{{ $item->bahan->energi }}</td>
-                                    <td>{{ $item->bahan->protein }}</td>
-                                    <td>{{ $item->bahan->lemak }}</td>
-                                    <td>{{ $item->bahan->karbo }}</td>
-                                    <td>{{ $item->bahan->serat }}</td>
+                                    <td>{{ $item->bahan->bahan ?? '-' }}</td>
+                                    <td>{{ $item->bahan->energi ?? 0 }}</td>
+                                    <td>{{ $item->bahan->protein ?? 0 }}</td>
+                                    <td>{{ $item->bahan->lemak ?? 0 }}</td>
+                                    <td>{{ $item->bahan->karbo ?? 0 }}</td>
+                                    <td>{{ $item->bahan->serat ?? 0 }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -58,7 +88,9 @@
                 </div>
 
             </div>
+
         @endforeach
+
     @endif
 </div>
 @endsection

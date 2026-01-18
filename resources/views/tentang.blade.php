@@ -1,33 +1,69 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="card shadow-sm border-0">
-    <div class="card-body">
-        <h2 class="text-success mb-3">Tentang Aplikasi Rekomendasi Makanan</h2>
-        <p class="text-muted">
-            Aplikasi ini dibuat untuk membantu orang tua, guru, dan anak sekolah dalam memilih menu makanan bergizi 
-            berdasarkan kebutuhan nutrisi harian. Dengan memanfaatkan data bahan makanan dan perhitungan nilai gizi, 
-            sistem ini memberikan rekomendasi menu yang seimbang agar anak mendapatkan asupan yang sesuai untuk 
-            mendukung pertumbuhan dan aktivitas belajar mereka.
-        </p>
+<style>
+    .btn-tentang {
+    background: linear-gradient(90deg, #8fc414, #60c414);
+    color: #fff;
+    border: none;
+}
+</style>
+<div class="container py-5">
 
-        <h4 class="text-success mt-4">Tujuan</h4>
-        <ul>
-            <li>Meningkatkan kesadaran pentingnya gizi seimbang untuk anak sekolah.</li>
-            <li>Menyediakan rekomendasi makanan yang bergizi berdasarkan data nutrisi.</li>
-            <li>Memudahkan pengguna dalam merencanakan menu harian.</li>
-        </ul>
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
 
-        <h4 class="text-success mt-4">Fitur Utama</h4>
-        <ul>
-            <li>Perhitungan nilai gizi dari bahan makanan.</li>
-            <li>Rekomendasi menu otomatis sesuai kebutuhan anak.</li>
-            <li>Antarmuka yang mudah digunakan.</li>
-        </ul>
+        <div class="row g-0 align-items-center">
 
-        <div class="text-center mt-4">
-            <a href="{{ url('/') }}" class="btn btn-success">Kembali ke Beranda</a>
+            {{-- GAMBAR --}}
+            <div class="col-md-5">
+                <img src="{{ asset('images/home/tentang.jpg') }}"
+                     class="img-fluid h-100 w-100 object-fit-cover"
+                     alt="Gizi Anak">
+            </div>
+
+            {{-- KONTEN --}}
+            <div class="col-md-7">
+                <div class="card-body p-4 p-md-5">
+
+                    <h2 class="fw-bold text-success mb-3">
+                        Tentang NutriMate
+                    </h2>
+
+                    <p class="text-muted mb-4">
+                        <strong>NutriMate</strong> adalah aplikasi rekomendasi makanan
+                        yang membantu orang tua dan anak sekolah dalam memilih
+                        menu makanan bergizi berdasarkan kebutuhan nutrisi harian.
+                        Sistem ini mengolah data gizi untuk memberikan rekomendasi
+                        menu yang seimbang guna mendukung pertumbuhan dan aktivitas belajar.
+                    </p>
+
+                    <div class="mb-4">
+                        <h5 class="fw-semibold text-success">Tujuan</h5>
+                        <ul class="text-muted">
+                            <li>Meningkatkan kesadaran pentingnya gizi seimbang.</li>
+                            <li>Menyediakan rekomendasi menu berbasis data nutrisi.</li>
+                            <li>Membantu perencanaan menu harian anak.</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="fw-semibold text-success">Fitur Utama</h5>
+                        <ul class="text-muted">
+                            <li>Perhitungan nilai gizi bahan makanan.</li>
+                            <li>Rekomendasi menu otomatis sesuai kebutuhan.</li>
+                            <li>Antarmuka sederhana dan mudah digunakan.</li>
+                        </ul>
+                    </div>
+
+                    <a href="{{ url('/') }}" class="btn btn-tentang btn-lg px-4">
+                        Kembali ke Beranda
+                    </a>
+
+                </div>
+            </div>
+
         </div>
     </div>
+
 </div>
 @endsection

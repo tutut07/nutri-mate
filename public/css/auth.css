@@ -1,132 +1,154 @@
-/* public/css/auth.css */
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
 
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
+    background: linear-gradient(135deg, #e8f5e9, #e3f2fd);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* CARD LOGIN */
 .container {
-    background-color: #fff;
-    padding: 30px 40px;
-    border-radius: 16px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
+/* JUDUL */
 h2 {
     text-align: center;
-    color: #333;
-    margin-bottom: 25px;
+    margin-bottom: 24px;
+    color: #2e7d32; /* hijau NutriMate */
+    font-weight: 700;
 }
 
+
+/* LABEL */
 label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
     display: block;
-    margin-bottom: 8px;
-    color: #555;
-    font-weight: bold;
+    color: #374151;
 }
 
-input {
+/* INPUT */
+input[type="email"],
+input[type="password"] {
     width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #d1d5db;
+    margin-bottom: 16px;
     font-size: 14px;
 }
 
 input:focus {
-    border-color: #6b21a8;
     outline: none;
-    box-shadow: 0 0 5px rgba(107,33,168,0.3);
+    border-color: #60c414;
+    box-shadow: 0 0 0 3px rgba(96,196,20,0.2);
 }
 
-button {
-    width: 100%;
-    background-color: #6b21a8;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #7c3aed;
-}
-
-.text-center {
-    text-align: center;
-}
-
-a {
-    color: #6b21a8;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-.error {
-    color: red;
-    text-align: center;
-    margin-bottom: 15px;
-}
-/* Bungkus password agar ukurannya SAMA seperti input biasa */
+/* PASSWORD TOGGLE */
 .input-wrapper {
     position: relative;
 }
 
 .toggle-password {
     position: absolute;
-    right: -4px;
-    top: 35%;
+    right: 14px;
+    top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    color: #777;
-    font-size: 18px;
-    z-index: 10;
+    color: #6b7280;
 }
 
-.input-wrapper input {
-    width: 100%;
-    padding-right: 12px; /* supaya text tidak tertutup ikon */
+/* REMEMBER ME */
+.remember-box {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
 }
-.btn-login {
+
+.remember-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #4b5563;
+}
+
+/* BUTTON LOGIN (PRIMARY) */
+button {
     width: 100%;
     padding: 12px;
-    background: #4CAF50;
-    color: white;
+    border-radius: 12px;
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
     font-size: 15px;
-    margin-top: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(90deg, #2e7d32, #2e7d32);
+    color: #ffffff;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
 }
 
-.btn-login:hover {
-    background: #45a049;
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
+/* BUTTON KEMBALI KE HOME (SECONDARY) */
 .btn-home {
     display: block;
     text-align: center;
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 8px;
-    background: #2196F3;
-    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    background: transparent;
+    border: 2px solid #2e7d32;
+    color: #2e7d32;
     text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 .btn-home:hover {
-    background: #0b7dda;
+    background: #2e7d32;
+    color: #ffffff;
+}
+
+/* LINK LUPA PASSWORD & DAFTAR */
+.text-center {
+    text-align: center;
+    margin-top: 14px;
+}
+
+.text-center a {
+    color: #4b5563; /* abu soft */
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.text-center a:hover {
+    color: #2e7d32;
+    text-decoration: underline;
+}
+
+/* ERROR MESSAGE */
+.error {
+    background: #fef2f2;
+    color: #b91c1c;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-bottom: 14px;
 }

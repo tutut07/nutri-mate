@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\RekomendasiUser;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+
 
 class RekomendasiController extends Controller
 {
@@ -30,7 +32,8 @@ public function hitung(Request $request)
     // VALIDASI USIA 4–18 TAHUN
     // =========================
     $request->validate(
-        [
+        [   
+            'nama'          => 'required|string|max:100',
             'jenis_kelamin' => 'required|in:pria,wanita',
             'usia'          => 'required|integer|min:4|max:18',
             'berat'         => 'required|numeric|min:1',
@@ -112,15 +115,23 @@ public function hitung(Request $request)
             $serat_target
         );
 
-        if ($menu) {
+         if ($menu) {
             $rekomendasi->push($menu);
-        }
-    }
 
-    // =========================
+            // =========================
+            // 🔥 SIMPAN KE DATABASE
+            // =========================
+            RekomendasiUser::create([
+                'user_id'        => Auth::id(),
+                'nama'           => $input['nama'], // ✅ PENTING
+                'kategori'       => $kategori,
+                'data_bahan_id'  => $menu->id,
+                'tanggal'        => Carbon::now()->toDateString(),
+            ]);
+         }
+    }
     session(['input_user' => $input]);
-session(['tidak_suka' => []]);
-session([
+    session([
     'rekomendasi_lama' => $rekomendasi
 ]);
 
@@ -148,6 +159,7 @@ session([
     // =========================
     // GANTI MENU TIDAK DISUKAI
     // =========================
+
  public function tolak(Request $request)
 {
     $input = session('input_user');
@@ -210,32 +222,31 @@ session([
     // =========================
     // LOGIKA INTI (INI FIX BUG)
     // =========================
-    $rekomendasi_baru = collect();
+   $rekomendasi_baru = collect();
 
-    foreach ($rekomendasi_lama as $menu_lama) {
+foreach ($rekomendasi_lama as $menu_lama) {
 
-        // JIKA DICENTANG → GANTI
-        if (in_array($menu_lama->id, $tidak_suka_total)) {
+    if (in_array($menu_lama->id, $tidak_suka_baru)) {
 
-            $menu_baru = $this->ambilMenu(
-                $menu_lama->kategori,
-                $energi_target,
-                $protein_target,
-                $lemak_target,
-                $karbo_target,
-                $serat_target,
-                $tidak_suka_total
-            );
+        $blacklist = array_merge($tidak_suka_total, [$menu_lama->id]);
 
-            if ($menu_baru) {
-                $rekomendasi_baru->push($menu_baru);
-            }
+        $menu_baru = $this->ambilMenu(
+            $menu_lama->kategori,
+            $energi_target,
+            $protein_target,
+            $lemak_target,
+            $karbo_target,
+            $serat_target,
+            $blacklist
+        );
 
-        } else {
-            // JIKA TIDAK → TETAP
-            $rekomendasi_baru->push($menu_lama);
-        }
+        // 🔒 FALLBACK
+        $rekomendasi_baru->push($menu_baru ?? $menu_lama);
+
+    } else {
+        $rekomendasi_baru->push($menu_lama);
     }
+}
 
     // UPDATE SESSION
     session(['rekomendasi_lama' => $rekomendasi_baru]);
@@ -245,26 +256,29 @@ session([
     // =========================
     if (Auth::check()) {
 
-        RekomendasiUser::where('user_id', Auth::id())
-            ->where('tanggal', now()->toDateString())
-            ->delete();
+    // HAPUS RIWAYAT HARI INI
+    RekomendasiUser::where('user_id', Auth::id())
+        ->where('nama', $input['nama'])
+        ->whereDate('tanggal', Carbon::now()->toDateString())
+        ->delete();
 
-        foreach ($rekomendasi_baru as $menu) {
-            RekomendasiUser::create([
-    'user_id'        => Auth::id(),
-    'data_bahan_id'  => $menu->id,
-    'kategori'       => $menu->kategori,
-    'tanggal'        => now()->toDateString(),
+    // SIMPAN HASIL BARU (LENGKAP)
+    foreach ($rekomendasi_baru as $menu) {
+        RekomendasiUser::create([
+            'user_id'        => Auth::id(),
+            'nama'           => $input['nama'],
+            'kategori'       => $menu->kategori,
+            'data_bahan_id'  => $menu->id,
+            'tanggal'        => Carbon::now()->toDateString(),
 
-    // DATA PENGGUNA
-    'usia'           => $input['usia'],
-    'berat'          => $input['berat'],
-    'tinggi'         => $input['tinggi'],
-    'jenis_kelamin'  => $input['jenis_kelamin'],
-]);
-
-        }
+            // 🔥 WAJIB TAMBAH INI
+            'usia'           => $input['usia'],
+            'berat'          => $input['berat'],
+            'tinggi'         => $input['tinggi'],
+            'jenis_kelamin'  => $input['jenis_kelamin'],
+        ]);
     }
+}
 
     return view('rekomendasi', [
         'bmr' => $bmr,
@@ -350,36 +364,45 @@ session([
     return $kandidat->first();
 }
 
-    public function riwayat()
+   public function riwayat()
 {
-    $riwayat = RekomendasiUser::with('bahan')
-        ->where('user_id', auth()->id())
+    $riwayat = RekomendasiUser::where('user_id', auth()->id())
         ->orderBy('tanggal', 'desc')
+        ->orderBy('created_at', 'desc')
         ->get()
-        ->groupBy('tanggal');
+        ->groupBy(function ($item) {
+            return $item->tanggal . '|' . $item->nama;
+        });
 
     return view('user.rekomendasi-riwayat', compact('riwayat'));
 }
-
-
-public function download($tanggal)
+public function hapusRiwayat($tanggal, $nama)
 {
-    $userId = auth()->id();
-
-    $riwayat = RekomendasiUser::with('bahan')
-        ->where('user_id', $userId)
+    RekomendasiUser::where('user_id', auth()->id())
         ->whereDate('tanggal', $tanggal)
-        ->orderBy('created_at', 'desc')
+        ->where('nama', $nama)
+        ->delete();
+
+    return redirect()
+        ->route('riwayat')
+        ->with('success', 'Riwayat berhasil dihapus.');
+}
+
+
+public function download($tanggal, $nama)
+{
+    $riwayat = RekomendasiUser::with('bahan')
+        ->where('user_id', auth()->id())
+        ->whereDate('tanggal', $tanggal)
+        ->where('nama', $nama)
+        ->orderBy('created_at', 'asc')
         ->get();
 
     if ($riwayat->isEmpty()) {
         return back()->with('error', 'Data tidak ditemukan');
     }
 
-    // ===============================
-    // DATA PENGGUNA (AMBIL DARI SESSION)
-    // ===============================
-    $input = session('input_user');
+    $dataAnak = $riwayat->first();
 
     // ===============================
     // HITUNG TOTAL GIZI
@@ -394,24 +417,30 @@ public function download($tanggal)
 
     foreach ($riwayat as $item) {
         if ($item->bahan) {
-            $hasilGizi['energi']  += $item->bahan->energi ?? 0;
-            $hasilGizi['protein'] += $item->bahan->protein ?? 0;
-            $hasilGizi['lemak']   += $item->bahan->lemak ?? 0;
-            $hasilGizi['karbo']   += $item->bahan->karbo ?? 0;
-            $hasilGizi['serat']   += $item->bahan->serat ?? 0;
+            $hasilGizi['energi']  += $item->bahan->energi;
+            $hasilGizi['protein'] += $item->bahan->protein;
+            $hasilGizi['lemak']   += $item->bahan->lemak;
+            $hasilGizi['karbo']   += $item->bahan->karbo;
+            $hasilGizi['serat']   += $item->bahan->serat;
         }
     }
 
     $pdf = Pdf::loadView('pdf.rekomendasi', [
-        'tanggal'   => $tanggal,
-        'waktu'     => $riwayat->first()->created_at,
-        'riwayat'   => $riwayat,
-        'hasilGizi' => $hasilGizi,
-        'input'     => $input,          // ✅ INI YANG KURANG
-        'user'      => auth()->user(),
+        'user'        => auth()->user(),
+        'tanggal'     => Carbon::parse($dataAnak->tanggal)->format('d-m-Y'),
+        'jam'         => Carbon::parse($dataAnak->created_at)->format('H:i'),
+
+        // 🔽 DATA ANAK (FIX)
+        'nama_anak'   => $dataAnak->nama,
+        'jk'          => $dataAnak->jenis_kelamin ?? '-',
+        'usia'        => $dataAnak->usia ?? '-',
+        'berat'       => $dataAnak->berat ?? '-',
+        'tinggi'      => $dataAnak->tinggi ?? '-',
+
+        'riwayat'     => $riwayat,
+        'hasilGizi'   => $hasilGizi,
     ]);
 
-    return $pdf->download('rekomendasi-nutrisi-' . $tanggal . '.pdf');
+    return $pdf->download("rekomendasi-{$nama}-{$tanggal}.pdf");
 }
-
 }

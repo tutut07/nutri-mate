@@ -6,8 +6,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RecommendationController;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\Rekomendasi;
-use App\Models\RekomendasiUser; // kalau dipakai
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +83,37 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/riwayat', [RekomendasiController::class, 'riwayat'])
     ->middleware('auth')
     ->name('riwayat');
-Route::get('/riwayat/download/{tanggal}', 
+Route::get('/riwayat/download/{tanggal}/{nama}', 
     [RekomendasiController::class, 'download']
-)->name('riwayat.download')->middleware('auth');
+)->name('riwayat.download');
+Route::delete('/riwayat/{tanggal}/{nama}', 
+    [RekomendasiController::class, 'hapusRiwayat']
+)->name('riwayat.hapus');
+
+/// Admin Routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+
+    Route::get('/dashboard', [AdminController::class, 'index'])
+        ->name('admin.dashboard');
+
+    // ========================
+    // KELOLA MENU
+    // ========================
+    Route::get('/manage-menu', [AdminController::class, 'manageMenu'])
+        ->name('admin.menu.index');
+
+    Route::get('/manage-menu/create', [AdminController::class, 'createMenu'])
+        ->name('admin.menu.create');
+
+    Route::post('/manage-menu', [AdminController::class, 'storeMenu'])
+        ->name('admin.menu.store');
+
+    Route::get('/manage-menu/{id}/edit', [AdminController::class, 'editMenu'])
+        ->name('admin.menu.edit');
+
+    Route::put('/manage-menu/{id}', [AdminController::class, 'updateMenu'])
+        ->name('admin.menu.update');
+
+    Route::delete('/manage-menu/{id}', [AdminController::class, 'destroyMenu'])
+        ->name('admin.menu.destroy');
+});

@@ -18,9 +18,10 @@ class AuthController extends Controller
     }
 
     // Proses login
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
+    
+public function login(Request $request)
+{
+   $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
@@ -31,15 +32,27 @@ class AuthController extends Controller
             }
         }
 
-        return back()->with('error', 'Email atau password salah.');
+    $remember = $request->has('remember');
+
+    if (Auth::attempt($credentials, $remember)) {
+        $request->session()->regenerate();
+        return redirect()->intended('/');
     }
 
+    return back()->with('error', 'Email atau password salah');
+}
+
     // Logout
-    public function logout()
-    {
-        Auth::logout();
-        return redirect('/');
-    }
+    public function logout(Request $request)
+{
+    Auth::logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/login');
+}
+
 
     // Tampilkan halaman register
     public function showRegister()
